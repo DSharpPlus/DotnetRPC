@@ -1,23 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Security.Principal;
-using System.Text;
 using System.Threading.Tasks;
-using DotnetRPC;
 using DotnetRPC.Entities;
 
 namespace DotnetRPC.Sample
 {
-	class Program
+	internal static class Program
 	{
 		private static void Main(string[] args)
 		{
-			bool admin = false;
-			using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
+			var admin = false;
+			using (var identity = WindowsIdentity.GetCurrent())
 			{
-				WindowsPrincipal principal = new WindowsPrincipal(identity);
+				var principal = new WindowsPrincipal(identity);
 				admin = principal.IsInRole(WindowsBuiltInRole.Administrator);
 			}
 
@@ -25,21 +21,21 @@ namespace DotnetRPC.Sample
 			Console.ReadKey();
 		}
 
-		public async static Task StartAsync(bool admin)
+		public static async Task StartAsync(bool admin)
 		{
-			RpcClient _client = new RpcClient("176019685471551488", admin, Assembly.GetExecutingAssembly().Location);
-			await _client.StartAsync();
+			var client = new RpcClient("176019685471551488", admin, Assembly.GetExecutingAssembly().Location);
+			await client.StartAsync();
 
-			RpcPresence presence = new RpcPresence()
+			var presence = new RpcPresence
 			{
 				Details = "DotnetRPC.Sample",
 				State = "Part of DSharpPlus",
-				Timestamps = new RpcTimestamps()
+				Timestamps = new RpcTimestamps
 				{
-					StartUnix = (int)DateTimeOffset.Now.ToUnixTimeSeconds(),
-					EndUnix = (int)DateTimeOffset.Now.AddDays(365).ToUnixTimeSeconds()
+					Start = DateTimeOffset.Now,
+					End = DateTimeOffset.Now.AddDays(365)
 				},
-				Assets = new RpcAssets()
+				Assets = new RpcAssets
 				{
 					LargeText = "hello",
 					SmallText = "test",
@@ -48,7 +44,11 @@ namespace DotnetRPC.Sample
 				}
 			};
 
+<<<<<<< HEAD
 			await _client.UpdateActivityAsync(presence);
+=======
+			await client.SetActivityAsync(presence);
+>>>>>>> 622ddd9dd2fb672943d784a30b7a8732a78f31a9
 		}
 	}
 }

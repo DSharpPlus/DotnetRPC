@@ -1,7 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System;
 using System.Text;
 
 namespace DotnetRPC.Entities
@@ -12,7 +9,7 @@ namespace DotnetRPC.Entities
 		Frame = 1,
 		Close = 2,
 		Ping = 3,
-		Pong = 4,
+		Pong = 4
 	}
 
 	internal class RpcFrame
@@ -35,10 +32,10 @@ namespace DotnetRPC.Entities
 
 		public byte[] GetByteData()
 		{
-			byte[] opcode = BitConverter.GetBytes((int)OpCode);
-			byte[] length = BitConverter.GetBytes(Length);
+			var opcode = BitConverter.GetBytes((int)OpCode);
+			var length = BitConverter.GetBytes(Length);
 
-			byte[] buffer = new byte[opcode.Length + length.Length /*kek*/ + Data.Length];
+			var buffer = new byte[opcode.Length + length.Length /*kek*/ + Data.Length];
 			opcode.CopyTo(buffer, 0);
 			length.CopyTo(buffer, opcode.Length);
 			Data.CopyTo(buffer, length.Length + opcode.Length);
@@ -50,9 +47,9 @@ namespace DotnetRPC.Entities
 		{
 			var frame = new RpcFrame();
 
-			byte[] opcode = new byte[4];
-			byte[] length = new byte[4];
-			byte[] data = new byte[input.Length - 8];
+			var opcode = new byte[4];
+			var length = new byte[4];
+			var data = new byte[input.Length - 8];
 
 			Array.Copy(input, 0, opcode, 0, 4);
 			Array.Copy(input, 4, length, 0, 4);

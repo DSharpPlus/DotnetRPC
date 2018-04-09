@@ -1,22 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Newtonsoft.Json;
 
 namespace DotnetRPC.Entities
 {
-    internal class RpcPresenceUpdate
-    {
+	internal class RpcEmptyPresenceUpdate
+	{
 		[JsonProperty("pid")]
 		public int ProcessId { get; internal set; }
-
-		[JsonProperty("activity", NullValueHandling = NullValueHandling.Ignore)]
-		public RpcPresence Presence { get; internal set; }
 
 		public override string ToString()
 		{
 			return JsonConvert.SerializeObject(this);
 		}
+	}
+
+    internal class RpcPresenceUpdate : RpcEmptyPresenceUpdate
+    {
+		[JsonProperty("activity", NullValueHandling = NullValueHandling.Include)]
+		public RpcPresence Presence { get; internal set; }
 	}
 
 	public class RpcPresence
@@ -46,10 +47,22 @@ namespace DotnetRPC.Entities
 	public class RpcTimestamps
 	{
 		[JsonProperty("start", NullValueHandling = NullValueHandling.Ignore)]
-		public int StartUnix { get; set; }
+		private long StartUnix { get; set; }
 
 		[JsonProperty("end", NullValueHandling = NullValueHandling.Ignore)]
-		public int EndUnix { get; set; }
+		private long EndUnix { get; set; }
+		
+		[JsonIgnore]
+		public DateTimeOffset Start {
+			set => StartUnix = value.ToUnixTimeSeconds();
+			get => DateTimeOffset.FromUnixTimeSeconds(StartUnix);
+		}
+
+		[JsonIgnore]
+		public DateTimeOffset End { 
+			set => EndUnix = value.ToUnixTimeSeconds();
+			get => DateTimeOffset.FromUnixTimeSeconds(EndUnix);
+		}
 	}
 
 	public class RpcAssets

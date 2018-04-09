@@ -1,15 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace DotnetRPC.Entities
 {
     internal class RpcCommand
     {
 		/// <summary>
-		/// RPC Command
+		/// payload command	
 		/// </summary>
 		[JsonProperty("cmd")]
 		public string Command { get; internal set; }
@@ -20,12 +18,15 @@ namespace DotnetRPC.Entities
 		[JsonProperty("args", NullValueHandling = NullValueHandling.Ignore)]
 		public JObject Arguments { get; internal set; }
 
-		/// <summary>
-		/// Nonce
-		/// </summary>
-		[JsonProperty("nonce")]
-		public string Nonce { get; internal set; } = new Random().Next(0, 1000).ToString();
+	    /// <summary>
+	    /// unique string used once for replies from the server	
+	    /// </summary>
+	    [JsonProperty("nonce")]
+	    public string Nonce { get; internal set; } = Guid.NewGuid().ToString();
 
+	    /// <summary>
+	    /// event data
+	    /// </summary>
 		[JsonProperty("data", NullValueHandling = NullValueHandling.Ignore)]
 		public JObject Data { get; internal set; }
 

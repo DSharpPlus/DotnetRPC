@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DotnetRPC
@@ -21,12 +20,13 @@ namespace DotnetRPC
 	/// </summary>
 	/// <typeparam name="T">Type of EventArgs for the event.</typeparam>
 	/// <returns>Event handling task.</returns>
-	public delegate Task AsyncEventHandler<T>(T e) where T : AsyncEventArgs;
+	public delegate Task AsyncEventHandler<in T>(T e) where T : AsyncEventArgs;
 
+	/// <inheritdoc />
 	/// <summary>
 	/// Represents asynchronous event arguments.
 	/// </summary>
-	public abstract class AsyncEventArgs : System.EventArgs
+	public abstract class AsyncEventArgs : EventArgs
 	{
 		/// <summary>
 		/// Gets or sets whether the event was completely handled. Setting this to true will prevent remaining handlers from running.
@@ -44,11 +44,11 @@ namespace DotnetRPC
 		private Action<string, Exception> ErrorHandler { get; }
 		private string EventName { get; }
 
-		public AsyncEvent(Action<string, Exception> errhandler, string event_name)
+		public AsyncEvent(Action<string, Exception> errhandler, string eventName)
 		{
 			this.Handlers = new List<AsyncEventHandler>();
 			this.ErrorHandler = errhandler;
-			this.EventName = event_name;
+			this.EventName = eventName;
 		}
 
 		public void Register(AsyncEventHandler handler)
@@ -79,11 +79,11 @@ namespace DotnetRPC
 				return;
 
 			var exs = new List<Exception>(handlers.Length);
-			for (var i = 0; i < handlers.Length; i++)
+			foreach (var handler in handlers)
 			{
 				try
 				{
-					await handlers[i]().ConfigureAwait(false);
+					await handler().ConfigureAwait(false);
 				}
 				catch (Exception ex)
 				{
@@ -107,11 +107,11 @@ namespace DotnetRPC
 		private Action<string, Exception> ErrorHandler { get; }
 		private string EventName { get; }
 
-		public AsyncEvent(Action<string, Exception> errhandler, string event_name)
+		public AsyncEvent(Action<string, Exception> errhandler, string eventName)
 		{
 			this.Handlers = new List<AsyncEventHandler<T>>();
 			this.ErrorHandler = errhandler;
-			this.EventName = event_name;
+			this.EventName = eventName;
 		}
 
 		public void Register(AsyncEventHandler<T> handler)
@@ -142,11 +142,11 @@ namespace DotnetRPC
 				return;
 
 			var exs = new List<Exception>(handlers.Length);
-			for (var i = 0; i < handlers.Length; i++)
+			foreach (var handler in handlers)
 			{
 				try
 				{
-					await handlers[i](e).ConfigureAwait(false);
+					await handler(e).ConfigureAwait(false);
 
 					if (e.Handled)
 						break;

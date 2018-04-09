@@ -6,7 +6,7 @@ using DotnetRPC.Entities;
 
 namespace DotnetRPC.Sample
 {
-	class Program
+	internal static class Program
 	{
 		private static void Main(string[] args)
 		{
@@ -21,7 +21,7 @@ namespace DotnetRPC.Sample
 			Console.ReadKey();
 		}
 
-		public async static Task StartAsync(bool admin)
+		public static async Task StartAsync(bool admin)
 		{
 			var client = new RpcClient("176019685471551488", admin, Assembly.GetExecutingAssembly().Location);
 			await client.StartAsync();

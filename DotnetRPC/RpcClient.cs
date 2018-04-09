@@ -108,18 +108,30 @@ namespace DotnetRPC
 			});
 		}
 
-		public async Task SetActivityAsync(RpcPresence presence, int pid = -1)
+		/// <summary>
+		/// Used to update a user's Rich Presence.
+		/// </summary>
+		/// <param name="activity">The activity/presence to set, or <c>null</c> to set a playing status without Rich
+		/// Presence.</param>
+		/// <param name="pid">The application's process ID, defaults to the current process' PID</param>
+		/// <returns>Task resolving when the command is executed</returns>
+		public async Task SetActivityAsync(RpcActivity activity, int pid = -1)
 		{
-			await this._apiClient.SendCommandAsync(Commands.SetActivity, new RpcPresenceUpdate
+			await this._apiClient.SendCommandAsync(Commands.SetActivity, new RpcActivityUpdate
 			{
 				ProcessId = pid != -1 ? pid : Process.GetCurrentProcess().Id,
-				Presence = presence
+				Activity = activity
 			});
 		}
 
-		public async Task ClearActivityAsync(RpcPresence presence, int pid = -1)
+		/// <summary>
+		/// Used to clear a user's Rich Presence and playing status.
+		/// </summary>
+		/// <param name="pid">The application's process ID, defaults to the current process' PID</param>
+		/// <returns>Task resolving when the command is executed</returns>
+		public async Task ClearActivityAsync(int pid = -1)
 		{
-			await this._apiClient.SendCommandAsync(Commands.SetActivity, new RpcEmptyPresenceUpdate
+			await this._apiClient.SendCommandAsync(Commands.SetActivity, new RpcEmptyActivityUpdate
 			{
 				ProcessId = pid != -1 ? pid : Process.GetCurrentProcess().Id,
 			});

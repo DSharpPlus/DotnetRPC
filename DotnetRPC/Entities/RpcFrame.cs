@@ -16,9 +16,9 @@ namespace DotnetRPC.Entities
 	{
 		public OpCode OpCode { get; internal set; }
 
-		public int Length { get { return Data.Length; } }
-
 		public byte[] Data { get; internal set; }
+
+		public int Length => Data.Length;
 
 		public void SetContent(string input)
 		{

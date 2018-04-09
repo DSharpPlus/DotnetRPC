@@ -12,47 +12,47 @@ namespace DotnetRPC
 {
 	internal class PipeClient
 	{
-		internal NamedPipeClientStream _pipe;
-		internal string _pipename;
-		internal Logger _logger;
+		internal readonly NamedPipeClientStream Pipe;
+		internal readonly string PipeName;
+		internal readonly Logger Logger;
 
-		public PipeClient(string pipename, Logger logger)
+		public PipeClient(string pipeName, Logger logger)
 		{
-			this._pipename = pipename;
-			_pipe = new NamedPipeClientStream(".", pipename, PipeDirection.InOut);
-			_logger = logger;
+			this.PipeName = pipeName;
+			Pipe = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut);
+			Logger = logger;
 		}
 
 		public async Task ConnectAsync()
 		{
-			await _pipe.ConnectAsync();
+			await Pipe.ConnectAsync();
 			await Task.Delay(1000);
-			if (!_pipe.IsConnected)
+			if (!Pipe.IsConnected)
 				throw new Exception("Connection failed. Attempting next ipc pipe.");
 
 
-			_logger.Print(LogLevel.Info, $"Connected to {_pipename}.", DateTimeOffset.Now);
+			Logger.Print(LogLevel.Info, $"Connected to {PipeName}.", DateTimeOffset.Now);
 		}
 
 		public async Task<byte[]> ReadNext()
 		{
-			if (!_pipe.IsConnected)
+			if (!Pipe.IsConnected)
 				throw new Exception("Pipe is not connected!");
 
-			var buffer = new byte[_pipe.InBufferSize];
-			await _pipe.ReadAsync(buffer, 0, (int)_pipe.InBufferSize);
+			var buffer = new byte[Pipe.InBufferSize];
+			await Pipe.ReadAsync(buffer, 0, (int)Pipe.InBufferSize);
 
 			return buffer;
 		}
 
 		public async Task WriteAsync(RpcFrame frame)
 		{
-			if (!_pipe.IsConnected)
+			if (!Pipe.IsConnected)
 				throw new Exception("Pipe is not connected!");
 
 			var bf = frame.GetByteData();
-			await _pipe.WriteAsync(bf, 0, bf.Length);
-			_logger.Print(LogLevel.Debug, $"Wrote frame with OpCode {frame.OpCode}\nwith Data:\n{JsonConvert.SerializeObject(frame.GetStringContent())}", DateTimeOffset.Now);
+			await Pipe.WriteAsync(bf, 0, bf.Length);
+			Logger.Print(LogLevel.Debug, $"Wrote frame with OpCode {frame.OpCode}\nwith Data:\n{JsonConvert.SerializeObject(frame.GetStringContent())}", DateTimeOffset.Now);
 		}
 	}
 }

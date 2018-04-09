@@ -10,26 +10,26 @@ namespace DotnetRPC
 		/// <summary>
 		/// Register application protocol as discord-[appid]:// (Windows only)
 		/// </summary>
-		/// <param name="AppId">Your app's Client ID</param>
-		/// <param name="ExePath">Path to your app EXE</param>
-		public static void RegisterAppWin(string AppId, string ExePath, Logger logger)
+		/// <param name="appId">Your app's Client ID</param>
+		/// <param name="exePath">Path to your app EXE</param>
+		public static void RegisterAppWin(string appId, string exePath, Logger logger)
 		{
 			// Register application protocol as discord-[appid]://
-			RegistryKey key = Registry.ClassesRoot.OpenSubKey($"discord-{AppId}");  // Open protocol key
+			var key = Registry.ClassesRoot.OpenSubKey($"discord-{appId}");  // Open protocol key
 
 			if (key != null)
-				Registry.ClassesRoot.DeleteSubKeyTree($"discord-{AppId}");
+				Registry.ClassesRoot.DeleteSubKeyTree($"discord-{appId}");
 
-			key = Registry.ClassesRoot.CreateSubKey($"discord-{AppId}"); // Create new key if not exists
+			key = Registry.ClassesRoot.CreateSubKey($"discord-{appId}"); // Create new key if not exists
 
-			key.SetValue(string.Empty, $"URL: Run game {AppId} Protocol");
+			key.SetValue(string.Empty, $"URL: Run game {appId} Protocol");
 			key.SetValue("URL Protocol", string.Empty);
 
 			var command = key.CreateSubKey(@"shell\open\command");
-			command.SetValue(string.Empty, ExePath);
+			command.SetValue(string.Empty, exePath);
 
 			var defaulticon = key.CreateSubKey(@"DefaultIcon");
-			defaulticon.SetValue(string.Empty, ExePath);
+			defaulticon.SetValue(string.Empty, exePath);
 
 			// Close registry keys.
 			command.Close();

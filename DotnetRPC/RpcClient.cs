@@ -19,24 +19,24 @@ namespace DotnetRPC
 
 		public event AsyncEventHandler<AsyncEventArgs> ConnectionClosed
 		{
-			add { this._connectionclosed.Register(value); }
-			remove { this._connectionclosed.Unregister(value); }
+			add => this._connectionclosed.Register(value);
+			remove => this._connectionclosed.Unregister(value);
 		}
-		private AsyncEvent<AsyncEventArgs> _connectionclosed;
+		private readonly AsyncEvent<AsyncEventArgs> _connectionclosed;
 
 		#endregion
-		internal PipeClient _pipe;
-		internal string _clientid;
-		internal Logger _logger;
+		internal PipeClient Pipe;
+		internal string ClientId;
+		internal readonly Logger Logger;
 
-		public RpcClient(string AppId, bool RegisterApp, string ExePath)
+		public RpcClient(string appId, bool registerApp, string exePath)
 		{
-			this._clientid = AppId;
-			this._logger = new Logger();
-			if (RegisterApp)
+			this.ClientId = appId;
+			this.Logger = new Logger();
+			if (registerApp)
 			{
 				if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-					RpcHelpers.RegisterAppWin(AppId, ExePath, _logger); // Register app protocol for Windows
+					RpcHelpers.RegisterAppWin(appId, exePath, Logger); // Register app protocol for Windows
 				else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 					throw new PlatformNotSupportedException("App protocols on Linux environments are not (yet) supported!"); // Register app protocol for Linux
 				else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
@@ -48,19 +48,19 @@ namespace DotnetRPC
 
 		internal void EventError(string evname, Exception ex)
 		{
-			this._logger.Print(LogLevel.Error, $"", DateTimeOffset.Now);
+			this.Logger.Print(LogLevel.Error, $"", DateTimeOffset.Now);
 		}
 
 		public async Task StartAsync()
 		{
-			_logger.Print(LogLevel.Info, "Connecting to Discord RPC..", DateTimeOffset.Now);
-			int rpc = 0;
-			for (int i = 0; i < 10; i++)
+			Logger.Print(LogLevel.Info, "Connecting to Discord RPC..", DateTimeOffset.Now);
+			var rpc = 0;
+			for (var i = 0; i < 10; i++)
 			{
-				_pipe = new PipeClient($"discord-ipc-{i}", this._logger);
+				Pipe = new PipeClient($"discord-ipc-{i}", this.Logger);
 				try
 				{
-					await _pipe.ConnectAsync();
+					await Pipe.ConnectAsync();
 					rpc = i;
 					break;
 				}
@@ -70,32 +70,31 @@ namespace DotnetRPC
 				}
 			}
 
-			_logger.Print(LogLevel.Info, $"Connected to pipe discord-ipc-{rpc}", DateTimeOffset.Now);
-			_logger.Print(LogLevel.Info, "Attempting handshake...", DateTimeOffset.Now);
+			Logger.Print(LogLevel.Info, $"Connected to pipe discord-ipc-{rpc}", DateTimeOffset.Now);
+			Logger.Print(LogLevel.Info, "Attempting handshake...", DateTimeOffset.Now);
 
-			var shake = new RpcFrame();
-			shake.OpCode = OpCode.Handshake;
+			var shake = new RpcFrame {OpCode = OpCode.Handshake};
 			var hs = new RpcHandshake();
 			shake.SetContent(JsonConvert.SerializeObject(hs));
 
-			await _pipe.WriteAsync(shake);
-			_logger.Print(LogLevel.Info, "Sent handshake", DateTimeOffset.Now);
+			await Pipe.WriteAsync(shake);
+			Logger.Print(LogLevel.Info, "Sent handshake", DateTimeOffset.Now);
 
 			await Task.Factory.StartNew(async () =>
 			{
 				while (true)
 				{
-					var frame = RpcFrame.FromBytes(await _pipe.ReadNext());
+					var frame = RpcFrame.FromBytes(await Pipe.ReadNext());
 					var content = JsonConvert.DeserializeObject<RpcCommand>(frame.GetStringContent());
-					_logger.Print(LogLevel.Debug, $"Received frame with OpCode {frame.OpCode}\nwith Data:\n{JsonConvert.SerializeObject(content)}", DateTimeOffset.Now);
+					Logger.Print(LogLevel.Debug, $"Received frame with OpCode {frame.OpCode}\nwith Data:\n{JsonConvert.SerializeObject(content)}", DateTimeOffset.Now);
 
 					// Handle frame here
 
 					switch (frame.OpCode)
 					{
 						case OpCode.Close:
-							_pipe._pipe.Close();
-							_logger.Print(LogLevel.Warning, $"Received Opcode Close. Closing RPC connection.", DateTimeOffset.Now);
+							Pipe.Pipe.Close();
+							Logger.Print(LogLevel.Warning, $"Received Opcode Close. Closing RPC connection.", DateTimeOffset.Now);
 							await _connectionclosed.InvokeAsync(null);
 							break;
 					}
@@ -109,19 +108,23 @@ namespace DotnetRPC
 		{
 			var frame = new RpcFrame();
 
-			var presenceupdate = new RpcPresenceUpdate();
-			presenceupdate.ProcessId = Process.GetCurrentProcess().Id;
-			presenceupdate.Presence = presence;
+			var presenceupdate = new RpcPresenceUpdate
+			{
+				ProcessId = Process.GetCurrentProcess().Id,
+				Presence = presence
+			};
 
-			var cmd = new RpcCommand();
-			cmd.Arguments = JObject.FromObject(presenceupdate);
-			cmd.Command = "SET_ACTIVITY";
-			cmd.Nonce = new Random().Next(0, int.MaxValue).ToString();
+			var cmd = new RpcCommand
+			{
+				Arguments = JObject.FromObject(presenceupdate),
+				Command = "SET_ACTIVITY",
+				Nonce = new Random().Next(0, int.MaxValue).ToString()
+			};
 
 			frame.OpCode = OpCode.Frame;
 			frame.SetContent(JsonConvert.SerializeObject(cmd));
 
-			await _pipe.WriteAsync(frame);
+			await Pipe.WriteAsync(frame);
 		}
 	}
 }

@@ -14,10 +14,10 @@ namespace DotnetRPC.Sample
 	{
 		private static void Main(string[] args)
 		{
-			bool admin = false;
-			using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
+			var admin = false;
+			using (var identity = WindowsIdentity.GetCurrent())
 			{
-				WindowsPrincipal principal = new WindowsPrincipal(identity);
+				var principal = new WindowsPrincipal(identity);
 				admin = principal.IsInRole(WindowsBuiltInRole.Administrator);
 			}
 
@@ -27,10 +27,10 @@ namespace DotnetRPC.Sample
 
 		public async static Task StartAsync(bool admin)
 		{
-			RpcClient _client = new RpcClient("176019685471551488", admin, Assembly.GetExecutingAssembly().Location);
-			await _client.StartAsync();
+			var client = new RpcClient("176019685471551488", admin, Assembly.GetExecutingAssembly().Location);
+			await client.StartAsync();
 
-			RpcPresence presence = new RpcPresence()
+			var presence = new RpcPresence()
 			{
 				Details = "DotnetRPC.Sample",
 				State = "Part of DSharpPlus",
@@ -48,7 +48,7 @@ namespace DotnetRPC.Sample
 				}
 			};
 
-			await _client.UpdatePresenceAsync(presence);
+			await client.UpdatePresenceAsync(presence);
 		}
 	}
 }

@@ -44,11 +44,11 @@ namespace DotnetRPC
 		private Action<string, Exception> ErrorHandler { get; }
 		private string EventName { get; }
 
-		public AsyncEvent(Action<string, Exception> errhandler, string event_name)
+		public AsyncEvent(Action<string, Exception> errhandler, string eventName)
 		{
 			this.Handlers = new List<AsyncEventHandler>();
 			this.ErrorHandler = errhandler;
-			this.EventName = event_name;
+			this.EventName = eventName;
 		}
 
 		public void Register(AsyncEventHandler handler)
@@ -107,11 +107,11 @@ namespace DotnetRPC
 		private Action<string, Exception> ErrorHandler { get; }
 		private string EventName { get; }
 
-		public AsyncEvent(Action<string, Exception> errhandler, string event_name)
+		public AsyncEvent(Action<string, Exception> errhandler, string eventName)
 		{
 			this.Handlers = new List<AsyncEventHandler<T>>();
 			this.ErrorHandler = errhandler;
-			this.EventName = event_name;
+			this.EventName = eventName;
 		}
 
 		public void Register(AsyncEventHandler<T> handler)

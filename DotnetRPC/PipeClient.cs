@@ -1,12 +1,8 @@
-﻿using DotnetRPC.Entities;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System;
 using System.IO.Pipes;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using DotnetRPC.Entities;
+using Newtonsoft.Json;
 
 namespace DotnetRPC
 {
@@ -40,7 +36,7 @@ namespace DotnetRPC
 				throw new Exception("Pipe is not connected!");
 
 			var buffer = new byte[Pipe.InBufferSize];
-			await Pipe.ReadAsync(buffer, 0, (int)Pipe.InBufferSize);
+			await Pipe.ReadAsync(buffer, 0, Pipe.InBufferSize);
 
 			return buffer;
 		}

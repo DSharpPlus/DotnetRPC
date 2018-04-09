@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Security.Principal;
-using System.Text;
 using System.Threading.Tasks;
-using DotnetRPC;
 using DotnetRPC.Entities;
 
 namespace DotnetRPC.Sample
@@ -30,16 +26,16 @@ namespace DotnetRPC.Sample
 			var client = new RpcClient("176019685471551488", admin, Assembly.GetExecutingAssembly().Location);
 			await client.StartAsync();
 
-			var presence = new RpcPresence()
+			var presence = new RpcPresence
 			{
 				Details = "DotnetRPC.Sample",
 				State = "Part of DSharpPlus",
-				Timestamps = new RpcTimestamps()
+				Timestamps = new RpcTimestamps
 				{
 					StartUnix = (int)DateTimeOffset.Now.ToUnixTimeSeconds(),
 					EndUnix = (int)DateTimeOffset.Now.AddDays(365).ToUnixTimeSeconds()
 				},
-				Assets = new RpcAssets()
+				Assets = new RpcAssets
 				{
 					LargeText = "hello",
 					SmallText = "test",

@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.IO.Pipes;
-using System.Threading.Tasks;
-using System.IO;
-using DotnetRPC.Entities;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using DotnetRPC.Entities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -66,7 +61,6 @@ namespace DotnetRPC
 				}
 				catch (Exception)
 				{
-					continue;
 				}
 			}
 

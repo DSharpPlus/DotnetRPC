@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace DotnetRPC
 {
     internal class Logger
     {
-		public Logger()
-		{
-
-		}
-
-		public void Print(LogLevel level, string content, DateTimeOffset time)
+	    public void Print(LogLevel level, string content, DateTimeOffset time)
 		{
 			switch (level)
 			{

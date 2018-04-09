@@ -1,7 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System;
 using System.Text;
 
 namespace DotnetRPC.Entities
@@ -12,7 +9,7 @@ namespace DotnetRPC.Entities
 		Frame = 1,
 		Close = 2,
 		Ping = 3,
-		Pong = 4,
+		Pong = 4
 	}
 
 	internal class RpcFrame

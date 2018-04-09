@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DotnetRPC
@@ -27,7 +26,7 @@ namespace DotnetRPC
 	/// <summary>
 	/// Represents asynchronous event arguments.
 	/// </summary>
-	public abstract class AsyncEventArgs : System.EventArgs
+	public abstract class AsyncEventArgs : EventArgs
 	{
 		/// <summary>
 		/// Gets or sets whether the event was completely handled. Setting this to true will prevent remaining handlers from running.

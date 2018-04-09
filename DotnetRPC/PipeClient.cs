@@ -1,4 +1,5 @@
 ﻿using DotnetRPC.Entities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,7 +14,6 @@ namespace DotnetRPC
 	{
 		internal NamedPipeClientStream _pipe;
 		internal string _pipename;
-		internal List<byte[]> _frame_queue = new List<byte[]>();
 		internal Logger _logger;
 
 		public PipeClient(string pipename, Logger logger)
@@ -34,32 +34,25 @@ namespace DotnetRPC
 			_logger.Print(LogLevel.Info, $"Connected to {_pipename}.", DateTimeOffset.Now);
 		}
 
-		public void QueueData(byte[] data)
-		{
-			_frame_queue.Add(data);
-		}
-
 		public async Task<byte[]> ReadNext()
 		{
 			if (!_pipe.IsConnected)
-				throw new Exception("Pipe is not connected! (READ)");
-
-			if (_frame_queue.Count > 0)
-			{
-				var dat = _frame_queue.First();
-
-				await _pipe.WriteAsync(dat, 0, dat.Length);
-				RpcFrame frame = RpcFrame.FromBytes(dat);
-				_logger.Print(LogLevel.Debug, $"Sent frame with OpCode {frame.OpCode}\nwith Data:\n{frame.GetStringContent()}", DateTimeOffset.Now);
-
-				_frame_queue.RemoveAt(_frame_queue.Count - 1);
-			}
-
+				throw new Exception("Pipe is not connected!");
 
 			var buffer = new byte[_pipe.InBufferSize];
 			await _pipe.ReadAsync(buffer, 0, (int)_pipe.InBufferSize);
 
 			return buffer;
+		}
+
+		public async Task WriteAsync(RpcFrame frame)
+		{
+			if (!_pipe.IsConnected)
+				throw new Exception("Pipe is not connected!");
+
+			var bf = frame.GetByteData();
+			await _pipe.WriteAsync(bf, 0, bf.Length);
+			_logger.Print(LogLevel.Debug, $"Wrote frame with OpCode {frame.OpCode}\nwith Data:\n{JsonConvert.SerializeObject(frame.GetStringContent())}", DateTimeOffset.Now);
 		}
 	}
 }

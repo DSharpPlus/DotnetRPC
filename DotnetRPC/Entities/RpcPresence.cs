@@ -28,7 +28,7 @@ namespace DotnetRPC.Entities
 		public string Details { get; set; }
 
 		[JsonProperty("timestamps", NullValueHandling = NullValueHandling.Ignore)]
-		public RpcTimestamps TimeStamps { get; set; }
+		public RpcTimestamps Timestamps { get; set; }
 
 		[JsonProperty("assets", NullValueHandling = NullValueHandling.Ignore)]
 		public RpcAssets Assets { get; set; }

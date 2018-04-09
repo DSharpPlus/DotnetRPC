@@ -34,7 +34,7 @@ namespace DotnetRPC.Sample
 			{
 				Details = "DotnetRPC.Sample",
 				State = "Part of DSharpPlus",
-				TimeStamps = new RpcTimestamps()
+				Timestamps = new RpcTimestamps()
 				{
 					StartUnix = (int)DateTimeOffset.Now.ToUnixTimeSeconds(),
 					EndUnix = (int)DateTimeOffset.Now.AddDays(365).ToUnixTimeSeconds()
@@ -48,7 +48,7 @@ namespace DotnetRPC.Sample
 				}
 			};
 
-			_client.QueuePresenceUpdate(presence);
+			await _client.UpdatePresenceAsync(presence);
 		}
 	}
 }

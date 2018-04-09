@@ -78,8 +78,8 @@ namespace DotnetRPC
 			var hs = new RpcHandshake();
 			shake.SetContent(JsonConvert.SerializeObject(hs));
 
-			_pipe.QueueData(shake.GetByteData());
-			_logger.Print(LogLevel.Info, "Queued handshake", DateTimeOffset.Now);
+			await _pipe.WriteAsync(shake);
+			_logger.Print(LogLevel.Info, "Sent handshake", DateTimeOffset.Now);
 
 			await Task.Factory.StartNew(async () =>
 			{
@@ -95,7 +95,6 @@ namespace DotnetRPC
 					{
 						case OpCode.Close:
 							_pipe._pipe.Close();
-							_pipe._frame_queue.Clear();
 							_logger.Print(LogLevel.Warning, $"Received Opcode Close. Closing RPC connection.", DateTimeOffset.Now);
 							await _connectionclosed.InvokeAsync(null);
 							break;
@@ -106,7 +105,7 @@ namespace DotnetRPC
 			});
 		}
 
-		public void QueuePresenceUpdate(RpcPresence presence)
+		public async Task UpdatePresenceAsync(RpcPresence presence)
 		{
 			var frame = new RpcFrame();
 
@@ -122,7 +121,7 @@ namespace DotnetRPC
 			frame.OpCode = OpCode.Frame;
 			frame.SetContent(JsonConvert.SerializeObject(cmd));
 
-			_pipe.QueueData(frame.GetByteData());
+			await _pipe.WriteAsync(frame);
 		}
 	}
 }

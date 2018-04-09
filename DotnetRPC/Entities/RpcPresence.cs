@@ -43,19 +43,19 @@ namespace DotnetRPC.Entities
 
 	public class RpcTimestamps
 	{
-		[JsonIgnore]
+		[JsonProperty("start", NullValueHandling = NullValueHandling.Ignore)]
 		private long StartUnix { get; set; }
 
-		[JsonIgnore]
+		[JsonProperty("end", NullValueHandling = NullValueHandling.Ignore)]
 		private long EndUnix { get; set; }
 		
-		[JsonProperty("start", NullValueHandling = NullValueHandling.Ignore)]
+		[JsonIgnore]
 		public DateTimeOffset Start {
 			set => StartUnix = value.ToUnixTimeSeconds();
 			get => DateTimeOffset.FromUnixTimeSeconds(StartUnix);
 		}
 
-		[JsonProperty("end", NullValueHandling = NullValueHandling.Ignore)]
+		[JsonIgnore]
 		public DateTimeOffset End { 
 			set => EndUnix = value.ToUnixTimeSeconds();
 			get => DateTimeOffset.FromUnixTimeSeconds(EndUnix);

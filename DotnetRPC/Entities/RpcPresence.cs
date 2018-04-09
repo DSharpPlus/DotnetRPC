@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace DotnetRPC.Entities
 {
@@ -42,11 +43,23 @@ namespace DotnetRPC.Entities
 
 	public class RpcTimestamps
 	{
+		[JsonIgnore]
+		private long StartUnix { get; set; }
+
+		[JsonIgnore]
+		private long EndUnix { get; set; }
+		
 		[JsonProperty("start", NullValueHandling = NullValueHandling.Ignore)]
-		public int StartUnix { get; set; }
+		public DateTimeOffset Start {
+			set => StartUnix = value.ToUnixTimeSeconds();
+			get => DateTimeOffset.FromUnixTimeSeconds(StartUnix);
+		}
 
 		[JsonProperty("end", NullValueHandling = NullValueHandling.Ignore)]
-		public int EndUnix { get; set; }
+		public DateTimeOffset End { 
+			set => EndUnix = value.ToUnixTimeSeconds();
+			get => DateTimeOffset.FromUnixTimeSeconds(EndUnix);
+		}
 	}
 
 	public class RpcAssets

@@ -32,8 +32,8 @@ namespace DotnetRPC.Sample
 				State = "Part of DSharpPlus",
 				Timestamps = new RpcTimestamps
 				{
-					StartUnix = (int)DateTimeOffset.Now.ToUnixTimeSeconds(),
-					EndUnix = (int)DateTimeOffset.Now.AddDays(365).ToUnixTimeSeconds()
+					Start = DateTimeOffset.Now,
+					End = DateTimeOffset.Now.AddDays(365)
 				},
 				Assets = new RpcAssets
 				{

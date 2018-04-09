@@ -142,11 +142,11 @@ namespace DotnetRPC
 				return;
 
 			var exs = new List<Exception>(handlers.Length);
-			for (var i = 0; i < handlers.Length; i++)
+			foreach (var handler in handlers)
 			{
 				try
 				{
-					await handlers[i](e).ConfigureAwait(false);
+					await handler(e).ConfigureAwait(false);
 
 					if (e.Handled)
 						break;

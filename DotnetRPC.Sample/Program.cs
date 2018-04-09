@@ -48,7 +48,7 @@ namespace DotnetRPC.Sample
 				}
 			};
 
-			await _client.UpdatePresenceAsync(presence);
+			await _client.UpdateActivityAsync(presence);
 		}
 	}
 }

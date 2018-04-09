@@ -26,7 +26,7 @@ namespace DotnetRPC.Sample
 			var client = new RpcClient("176019685471551488", admin, Assembly.GetExecutingAssembly().Location);
 			await client.StartAsync();
 
-			var presence = new RpcPresence
+			var presence = new RpcActivity
 			{
 				Details = "DotnetRPC.Sample",
 				State = "Part of DSharpPlus",

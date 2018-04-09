@@ -108,18 +108,24 @@ namespace DotnetRPC
 			});
 		}
 
-		public async Task SetActivityAsync(RpcPresence presence, int pid = -1)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="activity"></param>
+		/// <param name="pid"></param>
+		/// <returns></returns>
+		public async Task SetActivityAsync(RpcActivity activity, int pid = -1)
 		{
-			await this._apiClient.SendCommandAsync(Commands.SetActivity, new RpcPresenceUpdate
+			await this._apiClient.SendCommandAsync(Commands.SetActivity, new RpcActivityUpdate
 			{
 				ProcessId = pid != -1 ? pid : Process.GetCurrentProcess().Id,
-				Presence = presence
+				Activity = activity
 			});
 		}
 
-		public async Task ClearActivityAsync(RpcPresence presence, int pid = -1)
+		public async Task ClearActivityAsync(RpcActivity activity, int pid = -1)
 		{
-			await this._apiClient.SendCommandAsync(Commands.SetActivity, new RpcEmptyPresenceUpdate
+			await this._apiClient.SendCommandAsync(Commands.SetActivity, new RpcEmptyActivityUpdate
 			{
 				ProcessId = pid != -1 ? pid : Process.GetCurrentProcess().Id,
 			});

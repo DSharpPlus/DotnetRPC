@@ -50,7 +50,7 @@ namespace DotnetRPC
 
 				await _pipe.WriteAsync(dat, 0, dat.Length);
 				RpcFrame frame = RpcFrame.FromBytes(dat);
-				_logger.Print(LogLevel.Debug, $"Sent frame with OpCode {frame.OpCode}\nwith Data:\n{frame.GetStringContent()}\n", DateTimeOffset.Now);
+				_logger.Print(LogLevel.Debug, $"Sent frame with OpCode {frame.OpCode}\nwith Data:\n{frame.GetStringContent()}", DateTimeOffset.Now);
 
 				_frame_queue.RemoveAt(_frame_queue.Count - 1);
 			}

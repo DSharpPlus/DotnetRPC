@@ -15,22 +15,40 @@ namespace DotnetRPC
 {
 	public class RpcClient
 	{
+		#region Events
+
+		public event AsyncEventHandler<AsyncEventArgs> ConnectionClosed
+		{
+			add { this._connectionclosed.Register(value); }
+			remove { this._connectionclosed.Unregister(value); }
+		}
+		private AsyncEvent<AsyncEventArgs> _connectionclosed;
+
+		#endregion
 		internal PipeClient _pipe;
 		internal string _clientid;
 		internal Logger _logger;
 
-		public RpcClient(string AppId)
+		public RpcClient(string AppId, bool RegisterApp, string ExePath)
 		{
-			string Path = Assembly.GetExecutingAssembly().Location;
-
 			this._clientid = AppId;
 			this._logger = new Logger();
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-				RpcHelpers.RegisterAppWin(AppId, Path, _logger); // Register app protocol for Windows
-			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-				throw new PlatformNotSupportedException("Linux environments are not (yet) supported!"); // Register app protocol for Linux
-			else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-				throw new PlatformNotSupportedException("OSX environments are not (yet) supported!"); // Register app protocol for OSX
+			if (RegisterApp)
+			{
+				if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+					RpcHelpers.RegisterAppWin(AppId, ExePath, _logger); // Register app protocol for Windows
+				else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+					throw new PlatformNotSupportedException("App protocols on Linux environments are not (yet) supported!"); // Register app protocol for Linux
+				else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+					throw new PlatformNotSupportedException("App protocols on OSX environments are not (yet) supported!"); // Register app protocol for OSX
+			}
+
+			this._connectionclosed = new AsyncEvent<AsyncEventArgs>(EventError, "CONNECTION_CLOSE");
+		}
+
+		internal void EventError(string evname, Exception ex)
+		{
+			this._logger.Print(LogLevel.Error, $"", DateTimeOffset.Now);
 		}
 
 		public async Task StartAsync()
@@ -69,11 +87,42 @@ namespace DotnetRPC
 				{
 					var frame = RpcFrame.FromBytes(await _pipe.ReadNext());
 					var content = JsonConvert.DeserializeObject<RpcCommand>(frame.GetStringContent());
-					_logger.Print(LogLevel.Debug, $"Received frame with OpCode {frame.OpCode}\nwith Data:\n{JsonConvert.SerializeObject(content)}\n", DateTimeOffset.Now);
+					_logger.Print(LogLevel.Debug, $"Received frame with OpCode {frame.OpCode}\nwith Data:\n{JsonConvert.SerializeObject(content)}", DateTimeOffset.Now);
+
+					// Handle frame here
+
+					switch (frame.OpCode)
+					{
+						case OpCode.Close:
+							_pipe._pipe.Close();
+							_pipe._frame_queue.Clear();
+							_logger.Print(LogLevel.Warning, $"Received Opcode Close. Closing RPC connection.", DateTimeOffset.Now);
+							await _connectionclosed.InvokeAsync(null);
+							break;
+					}
 
 					await Task.Delay(50);
 				}
 			});
+		}
+
+		public void QueuePresenceUpdate(RpcPresence presence)
+		{
+			var frame = new RpcFrame();
+
+			var presenceupdate = new RpcPresenceUpdate();
+			presenceupdate.ProcessId = Process.GetCurrentProcess().Id;
+			presenceupdate.Presence = presence;
+
+			var cmd = new RpcCommand();
+			cmd.Arguments = JObject.FromObject(presenceupdate);
+			cmd.Command = "SET_ACTIVITY";
+			cmd.Nonce = new Random().Next(0, int.MaxValue).ToString();
+
+			frame.OpCode = OpCode.Frame;
+			frame.SetContent(JsonConvert.SerializeObject(cmd));
+
+			_pipe.QueueData(frame.GetByteData());
 		}
 	}
 }

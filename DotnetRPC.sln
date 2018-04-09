@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2015
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetRPC", "DotnetRPC\DotnetRPC.csproj", "{C3BA6DEB-BCB8-45AA-96A1-EFAFE1A33E59}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetRPC.Sample", "DotnetRPC.Sample\DotnetRPC.Sample.csproj", "{F098DABE-D1ED-4B04-B91D-B74585B48DEF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C3BA6DEB-BCB8-45AA-96A1-EFAFE1A33E59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3BA6DEB-BCB8-45AA-96A1-EFAFE1A33E59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3BA6DEB-BCB8-45AA-96A1-EFAFE1A33E59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3BA6DEB-BCB8-45AA-96A1-EFAFE1A33E59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F098DABE-D1ED-4B04-B91D-B74585B48DEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F098DABE-D1ED-4B04-B91D-B74585B48DEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F098DABE-D1ED-4B04-B91D-B74585B48DEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F098DABE-D1ED-4B04-B91D-B74585B48DEF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DF17DEDB-301A-42C6-BA30-AA1D20F9B189}
+	EndGlobalSection
+EndGlobal

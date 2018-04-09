@@ -16,7 +16,7 @@ namespace DotnetRPC.Entities
 
     internal class RpcPresenceUpdate : RpcEmptyPresenceUpdate
     {
-		[JsonProperty("activity", NullValueHandling = NullValueHandling.Ignore)]
+		[JsonProperty("activity", NullValueHandling = NullValueHandling.Include)]
 		public RpcPresence Presence { get; internal set; }
 	}
 

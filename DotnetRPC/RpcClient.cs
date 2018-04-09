@@ -15,10 +15,10 @@ namespace DotnetRPC
 
 		public event AsyncEventHandler<AsyncEventArgs> ConnectionClosed
 		{
-			add => this._connectionclosed.Register(value);
-			remove => this._connectionclosed.Unregister(value);
+			add => this._connectionClosed.Register(value);
+			remove => this._connectionClosed.Unregister(value);
 		}
-		private readonly AsyncEvent<AsyncEventArgs> _connectionclosed;
+		private readonly AsyncEvent<AsyncEventArgs> _connectionClosed;
 
 		#endregion
 		
@@ -40,7 +40,7 @@ namespace DotnetRPC
 					throw new PlatformNotSupportedException("App protocols on OSX environments are not (yet) supported!"); // Register app protocol for OSX
 			}
 
-			this._connectionclosed = new AsyncEvent<AsyncEventArgs>(EventError, "CONNECTION_CLOSE");
+			this._connectionClosed = new AsyncEvent<AsyncEventArgs>(EventError, "CONNECTION_CLOSE");
 		}
 
 		internal void EventError(string evname, Exception ex)
@@ -95,7 +95,7 @@ namespace DotnetRPC
 						case OpCode.Close:
 							Pipe.Pipe.Close();
 							Logger.Print(LogLevel.Warning, $"Received Opcode Close. Closing RPC connection.", DateTimeOffset.Now);
-							await _connectionclosed.InvokeAsync(null);
+							await _connectionClosed.InvokeAsync(null);
 							break;
 					}
 

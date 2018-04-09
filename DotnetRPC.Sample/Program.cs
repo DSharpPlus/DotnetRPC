@@ -43,7 +43,6 @@ namespace DotnetRPC.Sample
 					SmallImage = "saikosml"
 				}
 			};
-
 			await client.SetActivityAsync(presence);
 		}
 	}

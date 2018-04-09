@@ -136,5 +136,15 @@ namespace DotnetRPC
 				ProcessId = pid != -1 ? pid : Process.GetCurrentProcess().Id,
 			});
 		}
+
+		public void RegisterAppProtocol(string exepath)
+		{
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+				RpcHelpers.RegisterAppWin(this.ClientId, exepath, this.Logger); // Register app protocol for Windows
+			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+				throw new PlatformNotSupportedException("App protocols on Linux environments are not (yet) supported!"); // Register app protocol for Linux
+			else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+				throw new PlatformNotSupportedException("App protocols on OSX environments are not (yet) supported!"); // Register app protocol for OSX
+		}
 	}
 }

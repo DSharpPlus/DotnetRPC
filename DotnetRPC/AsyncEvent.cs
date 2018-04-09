@@ -21,8 +21,9 @@ namespace DotnetRPC
 	/// </summary>
 	/// <typeparam name="T">Type of EventArgs for the event.</typeparam>
 	/// <returns>Event handling task.</returns>
-	public delegate Task AsyncEventHandler<T>(T e) where T : AsyncEventArgs;
+	public delegate Task AsyncEventHandler<in T>(T e) where T : AsyncEventArgs;
 
+	/// <inheritdoc />
 	/// <summary>
 	/// Represents asynchronous event arguments.
 	/// </summary>

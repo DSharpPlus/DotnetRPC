@@ -22,6 +22,8 @@ namespace DotnetRPC
 
 		#endregion
 		
+		private ApiClient _apiClient;
+		
 		internal PipeClient Pipe;
 		internal string ClientId;
 		internal readonly Logger Logger;
@@ -63,9 +65,11 @@ namespace DotnetRPC
 				}
 				catch (Exception)
 				{
-					// TODO: handle this exception
 				}
 			}
+			// TODO: handle the failure case
+			
+			this._apiClient = new ApiClient(Pipe, Logger);
 
 			Logger.Print(LogLevel.Info, $"Connected to pipe discord-ipc-{rpc}", DateTimeOffset.Now);
 			Logger.Print(LogLevel.Info, "Attempting handshake...", DateTimeOffset.Now);
@@ -106,24 +110,19 @@ namespace DotnetRPC
 
 		public async Task SetActivityAsync(RpcPresence presence, int pid = -1)
 		{
-			var frame = new RpcFrame();
-
-			var presenceupdate = new RpcPresenceUpdate
+			await this._apiClient.WriteFrameAsync(new RpcPresenceUpdate
 			{
 				ProcessId = pid != -1 ? pid : Process.GetCurrentProcess().Id,
 				Presence = presence
-			};
+			});
+		}
 
-			var cmd = new RpcCommand
+		public async Task ClearActivityAsync(RpcPresence presence, int pid = -1)
+		{
+			await this._apiClient.WriteFrameAsync(new RpcEmptyPresenceUpdate
 			{
-				Arguments = JObject.FromObject(presenceupdate),
-				Command = Commands.SetActivity
-			};
-
-			frame.OpCode = OpCode.Frame;
-			frame.SetContent(JsonConvert.SerializeObject(cmd));
-
-			await Pipe.WriteAsync(frame);
+				ProcessId = pid != -1 ? pid : Process.GetCurrentProcess().Id,
+			});
 		}
 	}
 }

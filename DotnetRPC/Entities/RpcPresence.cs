@@ -3,18 +3,21 @@ using Newtonsoft.Json;
 
 namespace DotnetRPC.Entities
 {
-    internal class RpcPresenceUpdate
-    {
+	internal class RpcEmptyPresenceUpdate
+	{
 		[JsonProperty("pid")]
 		public int ProcessId { get; internal set; }
-
-		[JsonProperty("activity", NullValueHandling = NullValueHandling.Ignore)]
-		public RpcPresence Presence { get; internal set; }
 
 		public override string ToString()
 		{
 			return JsonConvert.SerializeObject(this);
 		}
+	}
+
+    internal class RpcPresenceUpdate : RpcEmptyPresenceUpdate
+    {
+		[JsonProperty("activity", NullValueHandling = NullValueHandling.Ignore)]
+		public RpcPresence Presence { get; internal set; }
 	}
 
 	public class RpcPresence

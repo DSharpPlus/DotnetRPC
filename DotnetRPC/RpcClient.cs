@@ -110,7 +110,7 @@ namespace DotnetRPC
 
 		public async Task SetActivityAsync(RpcPresence presence, int pid = -1)
 		{
-			await this._apiClient.WriteFrameAsync(new RpcPresenceUpdate
+			await this._apiClient.SendCommandAsync(Commands.SetActivity, new RpcPresenceUpdate
 			{
 				ProcessId = pid != -1 ? pid : Process.GetCurrentProcess().Id,
 				Presence = presence
@@ -119,7 +119,7 @@ namespace DotnetRPC
 
 		public async Task ClearActivityAsync(RpcPresence presence, int pid = -1)
 		{
-			await this._apiClient.WriteFrameAsync(new RpcEmptyPresenceUpdate
+			await this._apiClient.SendCommandAsync(Commands.SetActivity, new RpcEmptyPresenceUpdate
 			{
 				ProcessId = pid != -1 ? pid : Process.GetCurrentProcess().Id,
 			});

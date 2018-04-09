@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using DotnetRPC.Entities;
+using DotnetRPC.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -111,8 +112,7 @@ namespace DotnetRPC
 			var cmd = new RpcCommand
 			{
 				Arguments = JObject.FromObject(presenceupdate),
-				Command = "SET_ACTIVITY",
-				Nonce = new Random().Next(0, int.MaxValue).ToString()
+				Command = Commands.SetActivity
 			};
 
 			frame.OpCode = OpCode.Frame;

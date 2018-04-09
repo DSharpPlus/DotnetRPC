@@ -98,13 +98,13 @@ namespace DotnetRPC
 			});
 		}
 
-		public async Task SetActivityAsync(RpcPresence presence)
+		public async Task SetActivityAsync(RpcPresence presence, int pid = -1)
 		{
 			var frame = new RpcFrame();
 
 			var presenceupdate = new RpcPresenceUpdate
 			{
-				ProcessId = Process.GetCurrentProcess().Id,
+				ProcessId = pid != -1 ? pid : Process.GetCurrentProcess().Id,
 				Presence = presence
 			};
 

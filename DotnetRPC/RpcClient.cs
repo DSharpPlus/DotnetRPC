@@ -21,6 +21,7 @@ namespace DotnetRPC
 		private readonly AsyncEvent<AsyncEventArgs> _connectionclosed;
 
 		#endregion
+		
 		internal PipeClient Pipe;
 		internal string ClientId;
 		internal readonly Logger Logger;
@@ -62,6 +63,7 @@ namespace DotnetRPC
 				}
 				catch (Exception)
 				{
+					// TODO: handle this exception
 				}
 			}
 
@@ -77,6 +79,9 @@ namespace DotnetRPC
 
 			await Task.Factory.StartNew(async () =>
 			{
+				// TODO: add support for disconnecting
+				// that means a check here, and a cancellation token for ReadAsync in Pipe, because that will block
+				// (potentially forever) as well.
 				while (true)
 				{
 					var frame = RpcFrame.FromBytes(await Pipe.ReadNext());

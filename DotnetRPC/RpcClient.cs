@@ -109,11 +109,12 @@ namespace DotnetRPC
 		}
 
 		/// <summary>
-		/// 
+		/// Used to update a user's Rich Presence.
 		/// </summary>
-		/// <param name="activity"></param>
-		/// <param name="pid"></param>
-		/// <returns></returns>
+		/// <param name="activity">The activity/presence to set, or <c>null</c> to set a playing status without Rich
+		/// Presence.</param>
+		/// <param name="pid">The application's process ID, defaults to the current process' PID</param>
+		/// <returns>Task resolving when the command is executed</returns>
 		public async Task SetActivityAsync(RpcActivity activity, int pid = -1)
 		{
 			await this._apiClient.SendCommandAsync(Commands.SetActivity, new RpcActivityUpdate
@@ -123,7 +124,12 @@ namespace DotnetRPC
 			});
 		}
 
-		public async Task ClearActivityAsync(RpcActivity activity, int pid = -1)
+		/// <summary>
+		/// Used to clear a user's Rich Presence and playing status.
+		/// </summary>
+		/// <param name="pid">The application's process ID, defaults to the current process' PID</param>
+		/// <returns>Task resolving when the command is executed</returns>
+		public async Task ClearActivityAsync(int pid = -1)
 		{
 			await this._apiClient.SendCommandAsync(Commands.SetActivity, new RpcEmptyActivityUpdate
 			{

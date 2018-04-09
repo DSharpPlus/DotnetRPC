@@ -44,6 +44,9 @@ namespace DotnetRPC.Sample
 				}
 			};
 			await client.SetActivityAsync(presence);
+
+			await Task.Delay(10000);
+			client.Dispose();
 		}
 	}
 }

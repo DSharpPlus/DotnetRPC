@@ -98,7 +98,7 @@ namespace DotnetRPC
 			});
 		}
 
-		public async Task UpdatePresenceAsync(RpcPresence presence)
+		public async Task SetActivityAsync(RpcPresence presence)
 		{
 			var frame = new RpcFrame();
 

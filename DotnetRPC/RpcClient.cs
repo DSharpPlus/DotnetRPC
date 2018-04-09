@@ -123,5 +123,15 @@ namespace DotnetRPC
 
 			await _pipe.WriteAsync(frame);
 		}
+
+		public void RegisterAppProtocol(string exepath)
+		{
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+				RpcHelpers.RegisterAppWin(this._clientid, exepath, _logger); // Register app protocol for Windows
+			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+				throw new PlatformNotSupportedException("App protocols on Linux environments are not (yet) supported!"); // Register app protocol for Linux
+			else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+				throw new PlatformNotSupportedException("App protocols on OSX environments are not (yet) supported!"); // Register app protocol for OSX
+		}
 	}
 }

@@ -33,6 +33,18 @@ namespace DotnetRPC
 		/// </summary>
 		public bool Handled { get; set; }
 	}
+	
+	/// <inheritdoc />
+	/// <summary>
+	/// Represents event arguments for the <see cref="RpcClient.ClientErrored"/> event.
+	/// </summary>
+	public class ClientErroredEventArgs : AsyncEventArgs
+	{
+		/// <summary>
+		/// Gets the exception that occurred.
+		/// </summary>
+		public Exception Exception { get; set; }
+	}
 
 	/// <summary>
 	/// Represents an asynchronously-handled event.
@@ -46,9 +58,9 @@ namespace DotnetRPC
 
 		public AsyncEvent(Action<string, Exception> errhandler, string eventName)
 		{
-			this.Handlers = new List<AsyncEventHandler>();
-			this.ErrorHandler = errhandler;
-			this.EventName = eventName;
+			Handlers = new List<AsyncEventHandler>();
+			ErrorHandler = errhandler;
+			EventName = eventName;
 		}
 
 		public void Register(AsyncEventHandler handler)
@@ -56,8 +68,8 @@ namespace DotnetRPC
 			if (handler == null)
 				throw new ArgumentNullException(nameof(handler), "Handler cannot be null");
 
-			lock (this._lock)
-				this.Handlers.Add(handler);
+			lock (_lock)
+				Handlers.Add(handler);
 		}
 
 		public void Unregister(AsyncEventHandler handler)
@@ -65,15 +77,15 @@ namespace DotnetRPC
 			if (handler == null)
 				throw new ArgumentNullException(nameof(handler), "Handler cannot be null");
 
-			lock (this._lock)
-				this.Handlers.Remove(handler);
+			lock (_lock)
+				Handlers.Remove(handler);
 		}
 
 		public async Task InvokeAsync()
 		{
 			AsyncEventHandler[] handlers = null;
-			lock (this._lock)
-				handlers = this.Handlers.ToArray();
+			lock (_lock)
+				handlers = Handlers.ToArray();
 
 			if (!handlers.Any())
 				return;
@@ -92,7 +104,7 @@ namespace DotnetRPC
 			}
 
 			if (exs.Any())
-				this.ErrorHandler(this.EventName, new AggregateException("Exceptions occured within one or more event handlers. Check InnerExceptions for details.", exs));
+				ErrorHandler(EventName, new AggregateException("Exceptions occured within one or more event handlers. Check InnerExceptions for details.", exs));
 		}
 	}
 
@@ -109,9 +121,9 @@ namespace DotnetRPC
 
 		public AsyncEvent(Action<string, Exception> errhandler, string eventName)
 		{
-			this.Handlers = new List<AsyncEventHandler<T>>();
-			this.ErrorHandler = errhandler;
-			this.EventName = eventName;
+			Handlers = new List<AsyncEventHandler<T>>();
+			ErrorHandler = errhandler;
+			EventName = eventName;
 		}
 
 		public void Register(AsyncEventHandler<T> handler)
@@ -119,8 +131,8 @@ namespace DotnetRPC
 			if (handler == null)
 				throw new ArgumentNullException(nameof(handler), "Handler cannot be null");
 
-			lock (this._lock)
-				this.Handlers.Add(handler);
+			lock (_lock)
+				Handlers.Add(handler);
 		}
 
 		public void Unregister(AsyncEventHandler<T> handler)
@@ -128,15 +140,15 @@ namespace DotnetRPC
 			if (handler == null)
 				throw new ArgumentNullException(nameof(handler), "Handler cannot be null");
 
-			lock (this._lock)
-				this.Handlers.Remove(handler);
+			lock (_lock)
+				Handlers.Remove(handler);
 		}
 
 		public async Task InvokeAsync(T e)
 		{
 			AsyncEventHandler<T>[] handlers = null;
-			lock (this._lock)
-				handlers = this.Handlers.ToArray();
+			lock (_lock)
+				handlers = Handlers.ToArray();
 
 			if (!handlers.Any())
 				return;
@@ -158,7 +170,7 @@ namespace DotnetRPC
 			}
 
 			if (exs.Any())
-				this.ErrorHandler(this.EventName, new AggregateException("Exceptions occured within one or more event handlers. Check InnerExceptions for details.", exs));
+				ErrorHandler(EventName, new AggregateException("Exceptions occured within one or more event handlers. Check InnerExceptions for details.", exs));
 		}
 	}
 }

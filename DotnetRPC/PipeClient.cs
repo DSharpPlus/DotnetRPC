@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO.Pipes;
+using System.Threading;
 using System.Threading.Tasks;
 using DotnetRPC.Entities;
 using Newtonsoft.Json;
@@ -9,14 +10,15 @@ namespace DotnetRPC
 	internal class PipeClient
 	{
 		internal readonly NamedPipeClientStream Stream;
-		internal readonly string PipeName;
-		internal readonly Logger Logger;
+		
+		private readonly string _pipeName;
+		private readonly Logger _logger;
 
 		public PipeClient(string pipeName, Logger logger)
 		{
-			this.PipeName = pipeName;
+			_pipeName = pipeName;
 			Stream = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut);
-			Logger = logger;
+			_logger = logger;
 		}
 
 		public async Task ConnectAsync()
@@ -26,8 +28,7 @@ namespace DotnetRPC
 			if (!Stream.IsConnected)
 				throw new Exception("Connection failed. Attempting next ipc pipe.");
 
-
-			Logger.Print(LogLevel.Info, $"Connected to {PipeName}.", DateTimeOffset.Now);
+			_logger.Print(LogLevel.Info, $"Connected to {_pipeName}.", DateTimeOffset.Now);
 		}
 
 		public async Task<byte[]> ReadNext()
@@ -48,7 +49,7 @@ namespace DotnetRPC
 
 			var bf = frame.GetByteData();
 			await Stream.WriteAsync(bf, 0, bf.Length);
-			Logger.Print(LogLevel.Debug, $"Wrote frame with OpCode {frame.OpCode}\nwith Data:\n{JsonConvert.SerializeObject(frame.GetStringContent())}", DateTimeOffset.Now);
+			_logger.Print(LogLevel.Debug, $"Wrote frame with OpCode {frame.OpCode}\nwith Data:\n{JsonConvert.SerializeObject(frame.GetStringContent())}", DateTimeOffset.Now);
 		}
 	}
 }

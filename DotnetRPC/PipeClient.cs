@@ -8,22 +8,22 @@ namespace DotnetRPC
 {
 	internal class PipeClient
 	{
-		internal readonly NamedPipeClientStream Pipe;
+		internal readonly NamedPipeClientStream Stream;
 		internal readonly string PipeName;
 		internal readonly Logger Logger;
 
 		public PipeClient(string pipeName, Logger logger)
 		{
 			this.PipeName = pipeName;
-			Pipe = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut);
+			Stream = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut);
 			Logger = logger;
 		}
 
 		public async Task ConnectAsync()
 		{
-			await Pipe.ConnectAsync();
+			await Stream.ConnectAsync();
 			await Task.Delay(1000);
-			if (!Pipe.IsConnected)
+			if (!Stream.IsConnected)
 				throw new Exception("Connection failed. Attempting next ipc pipe.");
 
 
@@ -32,22 +32,22 @@ namespace DotnetRPC
 
 		public async Task<byte[]> ReadNext()
 		{
-			if (!Pipe.IsConnected)
+			if (!Stream.IsConnected)
 				throw new Exception("Pipe is not connected!");
 
-			var buffer = new byte[Pipe.InBufferSize];
-			await Pipe.ReadAsync(buffer, 0, Pipe.InBufferSize);
+			var buffer = new byte[Stream.InBufferSize];
+			await Stream.ReadAsync(buffer, 0, Stream.InBufferSize);
 
 			return buffer;
 		}
 
 		public async Task WriteAsync(RpcFrame frame)
 		{
-			if (!Pipe.IsConnected)
+			if (!Stream.IsConnected)
 				throw new Exception("Pipe is not connected!");
 
 			var bf = frame.GetByteData();
-			await Pipe.WriteAsync(bf, 0, bf.Length);
+			await Stream.WriteAsync(bf, 0, bf.Length);
 			Logger.Print(LogLevel.Debug, $"Wrote frame with OpCode {frame.OpCode}\nwith Data:\n{JsonConvert.SerializeObject(frame.GetStringContent())}", DateTimeOffset.Now);
 		}
 	}

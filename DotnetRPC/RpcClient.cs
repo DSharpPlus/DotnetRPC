@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using DotnetRPC.Entities;
 using DotnetRPC.Net;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace DotnetRPC
 {
@@ -25,7 +24,7 @@ namespace DotnetRPC
 		private ApiClient _apiClient;
 		
 		internal PipeClient Pipe;
-		internal string ClientId;
+		internal readonly string ClientId;
 		internal readonly Logger Logger;
 
 		public RpcClient(string appId, bool registerApp, string exePath)
@@ -75,8 +74,7 @@ namespace DotnetRPC
 			Logger.Print(LogLevel.Info, "Attempting handshake...", DateTimeOffset.Now);
 
 			var shake = new RpcFrame {OpCode = OpCode.Handshake};
-			var hs = new RpcHandshake();
-			hs.ClientId = this.ClientId;
+			var hs = new RpcHandshake {ClientId = this.ClientId};
 			shake.SetContent(JsonConvert.SerializeObject(hs));
 
 			await Pipe.WriteAsync(shake);
@@ -87,7 +85,7 @@ namespace DotnetRPC
 				// TODO: add support for disconnecting
 				// that means a check here, and a cancellation token for ReadAsync in Pipe, because that will block
 				// (potentially forever) as well.
-				while (Pipe.Pipe.IsConnected)
+				while (Pipe.Stream.IsConnected)
 				{
 					var frame = RpcFrame.FromBytes(await Pipe.ReadNext());
 					var content = JsonConvert.DeserializeObject<RpcCommand>(frame.GetStringContent());
@@ -98,8 +96,8 @@ namespace DotnetRPC
 					switch (frame.OpCode)
 					{
 						case OpCode.Close:
-							Pipe.Pipe.Close();
-							Logger.Print(LogLevel.Warning, $"Received Opcode Close. Closing RPC connection.", DateTimeOffset.Now);
+							Pipe.Stream.Close();
+							Logger.Print(LogLevel.Warning, "Received Opcode Close. Closing RPC connection.", DateTimeOffset.Now);
 							await _connectionClosed.InvokeAsync(null);
 							break;
 					}
@@ -150,8 +148,8 @@ namespace DotnetRPC
 
 		public void Dispose()
 		{
-			this.Pipe.Pipe.Close();
-			this.Pipe.Pipe.Dispose();
+			this.Pipe.Stream.Close();
+			this.Pipe.Stream.Dispose();
 		}
 	}
 }

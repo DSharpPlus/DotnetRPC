@@ -2,6 +2,7 @@
 {
     internal static class Commands
     {
+		// not all of these can be implemented over piping
         internal const string SetActivity = "SET_ACTIVITY";
 		internal const string Dispatch = "DISPATCH";
 		internal const string Authorize = "AUTHORIZE";

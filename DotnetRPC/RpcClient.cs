@@ -76,6 +76,7 @@ namespace DotnetRPC
 
 			var shake = new RpcFrame {OpCode = OpCode.Handshake};
 			var hs = new RpcHandshake();
+			hs.ClientId = this.ClientId;
 			shake.SetContent(JsonConvert.SerializeObject(hs));
 
 			await Pipe.WriteAsync(shake);

@@ -8,6 +8,6 @@ namespace DotnetRPC.Entities
 		public int Version = 1;
 
 		[JsonProperty("client_id")]
-		public string ClientId = "176019685471551488";
+		public string ClientId;
 	}
 }

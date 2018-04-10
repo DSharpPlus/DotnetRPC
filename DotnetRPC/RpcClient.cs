@@ -47,7 +47,7 @@ namespace DotnetRPC
 
 		internal void EventError(string evname, Exception ex)
 		{
-			this.Logger.Print(LogLevel.Error, $"", DateTimeOffset.Now);
+			this.Logger.Print(LogLevel.Error, $"Whope! {ex.StackTrace}", DateTimeOffset.Now);
 		}
 
 		public async Task StartAsync()

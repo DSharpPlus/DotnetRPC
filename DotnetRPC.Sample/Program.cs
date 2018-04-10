@@ -18,7 +18,7 @@ namespace DotnetRPC.Sample
 			}
 
 			StartAsync(admin).GetAwaiter().GetResult();
-			Console.ReadKey();
+
 		}
 
 		public static async Task StartAsync(bool admin)

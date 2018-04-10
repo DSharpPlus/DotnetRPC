@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 
 namespace DotnetRPC
 {
-	public class RpcClient
+	public class RpcClient : IDisposable
 	{
 		#region Events
 
@@ -47,7 +47,7 @@ namespace DotnetRPC
 
 		internal void EventError(string evname, Exception ex)
 		{
-			this.Logger.Print(LogLevel.Error, $"", DateTimeOffset.Now);
+			this.Logger.Print(LogLevel.Error, $"Whope! {ex.StackTrace}", DateTimeOffset.Now);
 		}
 
 		public async Task StartAsync()
@@ -76,6 +76,7 @@ namespace DotnetRPC
 
 			var shake = new RpcFrame {OpCode = OpCode.Handshake};
 			var hs = new RpcHandshake();
+			hs.ClientId = this.ClientId;
 			shake.SetContent(JsonConvert.SerializeObject(hs));
 
 			await Pipe.WriteAsync(shake);
@@ -86,7 +87,7 @@ namespace DotnetRPC
 				// TODO: add support for disconnecting
 				// that means a check here, and a cancellation token for ReadAsync in Pipe, because that will block
 				// (potentially forever) as well.
-				while (true)
+				while (Pipe.Pipe.IsConnected)
 				{
 					var frame = RpcFrame.FromBytes(await Pipe.ReadNext());
 					var content = JsonConvert.DeserializeObject<RpcCommand>(frame.GetStringContent());
@@ -145,6 +146,12 @@ namespace DotnetRPC
 				throw new PlatformNotSupportedException("App protocols on Linux environments are not (yet) supported!"); // Register app protocol for Linux
 			else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
 				throw new PlatformNotSupportedException("App protocols on OSX environments are not (yet) supported!"); // Register app protocol for OSX
+		}
+
+		public void Dispose()
+		{
+			this.Pipe.Pipe.Close();
+			this.Pipe.Pipe.Dispose();
 		}
 	}
 }

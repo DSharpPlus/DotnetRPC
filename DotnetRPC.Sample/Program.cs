@@ -18,7 +18,7 @@ namespace DotnetRPC.Sample
 			}
 
 			StartAsync(admin).GetAwaiter().GetResult();
-			Console.ReadKey();
+
 		}
 
 		public static async Task StartAsync(bool admin)
@@ -44,6 +44,9 @@ namespace DotnetRPC.Sample
 				}
 			};
 			await client.SetActivityAsync(presence);
+
+			await Task.Delay(10000);
+			client.Dispose();
 		}
 	}
 }

@@ -34,11 +34,13 @@ namespace DotnetRPC.Entities
 		{
 			var opcode = BitConverter.GetBytes((int)OpCode);
 			var length = BitConverter.GetBytes(Length);
+			const int opcodeSize = sizeof(int);
+			const int lengthSize = sizeof(int);
 
-			var buffer = new byte[opcode.Length + length.Length /*kek*/ + Data.Length];
+			var buffer = new byte[opcodeSize + lengthSize + Data.Length];
 			opcode.CopyTo(buffer, 0);
-			length.CopyTo(buffer, opcode.Length);
-			Data.CopyTo(buffer, length.Length + opcode.Length);
+			length.CopyTo(buffer, opcodeSize);
+			Data.CopyTo(buffer, opcodeSize + lengthSize);
 
 			return buffer;
 		}

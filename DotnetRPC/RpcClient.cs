@@ -27,30 +27,30 @@ namespace DotnetRPC
 		private readonly AsyncEvent<ClientErroredEventArgs> _clientErrored;
 
 		#endregion
-		
+
 		private ApiClient ApiClient { get; set; }
 		private PipeClient Pipe { get; set; }
 		private string ClientId { get; }
 		private Logger Logger { get; }
-		
+
 		public RpcClient(string appId, bool registerApp = false, string exePath = null)
 		{
 			ClientId = appId;
 			Logger = new Logger();
-			
+
 			if (registerApp)
 			{
 				if (exePath == null)
 					throw new ArgumentNullException(nameof(exePath), "Pitiful! If you set registerApp to true, you " +
-					                                                 "must provide path to the executable to register.");
-				
+																	 "must provide path to the executable to register.");
+
 				RegisterAppProtocol(exePath);
 			}
 
 			_connectionClosed = new AsyncEvent<AsyncEventArgs>(EventError, "CONNECTION_CLOSE");
 			_clientErrored = new AsyncEvent<ClientErroredEventArgs>(EventError, "CLIENT_ERROR");
 		}
-		
+
 		internal void EventError(string evname, Exception ex)
 		{
 			Logger.Print(LogLevel.Error, $"Whope! Error in event handler: {ex.StackTrace}", DateTimeOffset.Now);
@@ -74,14 +74,14 @@ namespace DotnetRPC
 				}
 			}
 			// TODO: handle the failure case
-			
+
 			ApiClient = new ApiClient(Pipe, Logger);
 
 			Logger.Print(LogLevel.Info, $"Connected to pipe discord-ipc-{rpc}", DateTimeOffset.Now);
 			Logger.Print(LogLevel.Info, "Attempting handshake...", DateTimeOffset.Now);
 
-			var shake = new RpcFrame {OpCode = OpCode.Handshake};
-			var hs = new RpcHandshake {ClientId = ClientId};
+			var shake = new RpcFrame { OpCode = OpCode.Handshake };
+			var hs = new RpcHandshake { ClientId = ClientId };
 			shake.SetContent(JsonConvert.SerializeObject(hs));
 
 			await Pipe.WriteAsync(shake);
@@ -118,7 +118,7 @@ namespace DotnetRPC
 				}
 				catch (Exception e)
 				{
-					await _clientErrored.InvokeAsync(new ClientErroredEventArgs {Exception = e});
+					await _clientErrored.InvokeAsync(new ClientErroredEventArgs { Exception = e });
 				}
 			});
 		}
@@ -137,6 +137,67 @@ namespace DotnetRPC
 				ProcessId = pid != -1 ? pid : Process.GetCurrentProcess().Id,
 				Activity = activity
 			});
+		}
+
+		public async Task SetActivityAsync(Action<ActivitySetModel> action, int pid = -1)
+		{
+			var mdl = new ActivitySetModel();
+			action(mdl);
+
+			var activity = new RpcActivity();
+
+			#region oof
+			if (!string.IsNullOrEmpty(mdl.LargeImage)
+				|| !string.IsNullOrEmpty(mdl.LargeImageText)
+				|| !string.IsNullOrEmpty(mdl.SmallImage)
+				|| !string.IsNullOrEmpty(mdl.SmallImageText))
+				activity.Assets = new RpcAssets();
+
+			if (!string.IsNullOrEmpty(mdl.LargeImage))
+				activity.Assets.LargeImage = mdl.LargeImage;
+			if (!string.IsNullOrEmpty(mdl.SmallImage))
+				activity.Assets.SmallImage = mdl.SmallImage;
+			if (!string.IsNullOrEmpty(mdl.LargeImageText))
+				activity.Assets.LargeText = mdl.LargeImageText;
+			if (!string.IsNullOrEmpty(mdl.SmallImageText))
+				activity.Assets.SmallText = mdl.SmallImageText;
+
+			if (!string.IsNullOrEmpty(mdl.Details))
+				activity.Details = mdl.Details;
+			if (!string.IsNullOrEmpty(mdl.State))
+				activity.State = mdl.State;
+
+			if ((mdl.CurrentPartySize > 0 && mdl.MaxPartySize > 0) || !string.IsNullOrEmpty(mdl.PartyId))
+				activity.Party = new RpcParty();
+
+			if (!string.IsNullOrEmpty(mdl.PartyId))
+				activity.Party.Id = mdl.PartyId;
+			if (mdl.CurrentPartySize > 0 && mdl.MaxPartySize > 0)
+				activity.Party.Size = new int[2] { mdl.CurrentPartySize, mdl.MaxPartySize };
+
+			if (!string.IsNullOrEmpty(mdl.JoinSecret)
+				|| !string.IsNullOrEmpty(mdl.MatchSecret)
+				|| !string.IsNullOrEmpty(mdl.SpectateSecret))
+				activity.Secrets = new RpcSecrets();
+
+			if (!string.IsNullOrEmpty(mdl.JoinSecret))
+				activity.Secrets.Join = mdl.JoinSecret;
+			if (!string.IsNullOrEmpty(mdl.MatchSecret))
+				activity.Secrets.Match = mdl.MatchSecret;
+			if (!string.IsNullOrEmpty(mdl.SpectateSecret))
+				activity.Secrets.Spectate = mdl.SpectateSecret;
+
+			if (mdl.StartUnix._unixvalue > 0 && mdl.EndUnix._unixvalue > 0)
+				activity.Timestamps = new RpcTimestamps();
+
+			if (mdl.StartUnix._unixvalue > 0)
+				activity.Timestamps.StartUnix = mdl.StartUnix;
+
+			if (mdl.EndUnix._unixvalue > 0)
+				activity.Timestamps.EndUnix = mdl.EndUnix;
+			#endregion
+
+			await this.SetActivityAsync(activity, pid);
 		}
 
 		/// <summary>

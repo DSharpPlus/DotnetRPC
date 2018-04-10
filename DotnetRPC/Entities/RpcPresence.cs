@@ -46,21 +46,24 @@ namespace DotnetRPC.Entities
 
 	public class RpcTimestamps
 	{
+		// THESE ARE DEFINED AS INTEGERS BY DOCS, SSG.. 
+		// https://discordapp.com/developers/docs/topics/gateway#activity-object-activity-timestamps
+
 		[JsonProperty("start", NullValueHandling = NullValueHandling.Ignore)]
-		private long StartUnix { get; set; }
+		internal int StartUnix { get; set; }
 
 		[JsonProperty("end", NullValueHandling = NullValueHandling.Ignore)]
-		private long EndUnix { get; set; }
+		internal int EndUnix { get; set; }
 		
 		[JsonIgnore]
 		public DateTimeOffset Start {
-			set => StartUnix = value.ToUnixTimeSeconds();
+			set => StartUnix = (int)value.ToUnixTimeSeconds();
 			get => DateTimeOffset.FromUnixTimeSeconds(StartUnix);
 		}
 
 		[JsonIgnore]
 		public DateTimeOffset End { 
-			set => EndUnix = value.ToUnixTimeSeconds();
+			set => EndUnix = (int)value.ToUnixTimeSeconds();
 			get => DateTimeOffset.FromUnixTimeSeconds(EndUnix);
 		}
 	}

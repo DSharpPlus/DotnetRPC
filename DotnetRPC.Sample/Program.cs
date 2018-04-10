@@ -36,6 +36,7 @@ namespace DotnetRPC.Sample
 			};
 			await client.ConnectAsync();
 
+			/*
 			var presence = new RpcActivity
 			{
 				Details = "DotnetRPC.Sample",
@@ -54,6 +55,21 @@ namespace DotnetRPC.Sample
 				}
 			};
 			await client.SetActivityAsync(presence);
+			*/
+
+			await client.SetActivityAsync(x =>
+			{
+				x.Details = "DotnetRPC.Sample";
+				x.State = "Part of DSharpPlus";
+				x.StartUnix = DateTimeOffset.Now;
+				x.EndUnix = DateTimeOffset.Now.AddHours(24);
+
+				x.LargeImage = "canary-large";
+				x.LargeImageText = "Testing testing testing";
+
+				x.SmallImage = "ptb-small";
+				x.SmallImageText = "ayy ayy";
+			});
 
 			await Task.Delay(10000);
 			client.Dispose();

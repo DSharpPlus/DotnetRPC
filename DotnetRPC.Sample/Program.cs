@@ -17,13 +17,13 @@ namespace DotnetRPC.Sample
 				admin = principal.IsInRole(WindowsBuiltInRole.Administrator);
 			}
 
-			StartAsync(admin).GetAwaiter().GetResult();
-
+			var asx = new AsyncExecutor();
+			asx.Execute(StartAsync(admin));
 		}
 
 		public static async Task StartAsync(bool admin)
 		{
-			var client = new RpcClient("176019685471551488", admin, Assembly.GetExecutingAssembly().Location);
+			var client = new RpcClient("345229890980937739", admin, Assembly.GetExecutingAssembly().Location);
 			client.ConnectionClosed += _ =>
 			{
 				Console.WriteLine("Disconnected!");
@@ -40,17 +40,17 @@ namespace DotnetRPC.Sample
 			{
 				Details = "DotnetRPC.Sample",
 				State = "Part of DSharpPlus",
-				Timestamps =
+				Timestamps = new RpcTimestamps
 				{
 					Start = DateTimeOffset.Now,
 					End = DateTimeOffset.Now.AddDays(365)
 				},
-				Assets =
+				Assets = new RpcAssets
 				{
 					LargeText = "hello",
 					SmallText = "test",
-					LargeImage = "saiko",
-					SmallImage = "saikosml"
+					LargeImage = "canary-large",
+					SmallImage = "ptb-small"
 				}
 			};
 			await client.SetActivityAsync(presence);

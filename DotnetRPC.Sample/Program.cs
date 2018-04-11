@@ -45,10 +45,10 @@ namespace DotnetRPC.Sample
 					x.EndUnix = DateTimeOffset.Now.AddHours(24);
 
 					x.LargeImage = "canary-large";
-					x.LargeImageText = "Testing testing testing";
+					x.LargeImageText = "Canary icon";
 
 					x.SmallImage = "ptb-small";
-					x.SmallImageText = "ayy ayy";
+					x.SmallImageText = "PTB icon";
 
 					x.CurrentPartySize = 1;
 					x.MaxPartySize = 10;

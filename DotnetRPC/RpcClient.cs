@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DotnetRPC.Entities;
 using DotnetRPC.Net;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace DotnetRPC
 {
@@ -19,6 +20,7 @@ namespace DotnetRPC
 			remove => _connectionClosed.Unregister(value);
 		}
 		private readonly AsyncEvent<AsyncEventArgs> _connectionClosed;
+
 		public event AsyncEventHandler<ClientErroredEventArgs> ClientErrored
 		{
 			add => _clientErrored.Register(value);
@@ -26,7 +28,16 @@ namespace DotnetRPC
 		}
 		private readonly AsyncEvent<ClientErroredEventArgs> _clientErrored;
 
+		public event AsyncEventHandler<RpcReady> Ready
+		{
+			add => _ready.Register(value);
+			remove => _ready.Unregister(value);
+		}
+		private readonly AsyncEvent<RpcReady> _ready;
 		#endregion
+
+		public RpcUser CurrentUser { get; internal set; } = null;
+		public int Version { get; internal set; } = 1;
 
 		private ApiClient ApiClient { get; set; }
 		private PipeClient Pipe { get; set; }
@@ -49,6 +60,7 @@ namespace DotnetRPC
 
 			_connectionClosed = new AsyncEvent<AsyncEventArgs>(EventError, "CONNECTION_CLOSE");
 			_clientErrored = new AsyncEvent<ClientErroredEventArgs>(EventError, "CLIENT_ERROR");
+			_ready = new AsyncEvent<RpcReady>(EventError, Events.Ready);
 		}
 
 		internal void EventError(string evname, Exception ex)
@@ -108,6 +120,11 @@ namespace DotnetRPC
 								Logger.Print(LogLevel.Warning, "Received Opcode Close. Closing RPC connection.", DateTimeOffset.Now);
 								await _connectionClosed.InvokeAsync(null);
 								break;
+							case OpCode.Frame:
+								var cmd = JsonConvert.DeserializeObject<RpcCommand>(frame.GetStringContent());
+								Logger.Print(LogLevel.Debug, $"Received Opcode Frame with command {cmd.Command}", DateTimeOffset.Now);
+								await HandleFrameAsync(cmd);
+								break;
 						}
 
 						await Task.Delay(50);
@@ -121,6 +138,33 @@ namespace DotnetRPC
 					await _clientErrored.InvokeAsync(new ClientErroredEventArgs { Exception = e });
 				}
 			});
+		}
+
+		internal async Task HandleFrameAsync(RpcCommand frame)
+		{
+			switch (frame.Command)
+			{
+				case Commands.Dispatch:
+					await HandleEventAsync(frame.Event, frame.Data);
+					break;
+			}
+		}
+
+		internal async Task HandleEventAsync(string evt, JObject data)
+		{
+			switch (evt)
+			{
+				case Events.Ready:
+					var ready = data.ToObject<RpcReady>();
+
+					this.Logger.Print(LogLevel.Info, $"Received READY with user {ready.User.Username}#{ready.User.Discriminator} with ID {ready.User.Id}", DateTimeOffset.Now);
+
+					this.CurrentUser = ready.User;
+					this.Version = ready.Version;
+
+					await _ready.InvokeAsync(ready);
+					break;
+			}
 		}
 
 		/// <summary>

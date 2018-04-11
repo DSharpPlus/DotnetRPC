@@ -6,4 +6,7 @@
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.5.0-preview1-26216-02" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="EventArgs\" />
+  </ItemGroup>
 </Project>

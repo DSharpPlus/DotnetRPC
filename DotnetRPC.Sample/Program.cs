@@ -34,46 +34,34 @@ namespace DotnetRPC.Sample
 				Console.WriteLine($"Client error: {args.Exception}");
 				return Task.CompletedTask;
 			};
+			client.Ready += async args =>
+			{
+				// Only start doing stuff on ready c:
+				await client.SetActivityAsync(x =>
+				{
+					x.Details = "DotnetRPC.Sample";
+					x.State = "Part of DSharpPlus";
+					x.StartUnix = DateTimeOffset.Now;
+					x.EndUnix = DateTimeOffset.Now.AddHours(24);
+
+					x.LargeImage = "canary-large";
+					x.LargeImageText = "Testing testing testing";
+
+					x.SmallImage = "ptb-small";
+					x.SmallImageText = "ayy ayy";
+
+					x.CurrentPartySize = 1;
+					x.MaxPartySize = 10;
+					x.PartyId = "meme";
+				});
+			};
+
 			await client.ConnectAsync();
 
-			/*
-			var presence = new RpcActivity
-			{
-				Details = "DotnetRPC.Sample",
-				State = "Part of DSharpPlus",
-				Timestamps = new RpcTimestamps
-				{
-					Start = DateTimeOffset.Now,
-					End = DateTimeOffset.Now.AddDays(365)
-				},
-				Assets = new RpcAssets
-				{
-					LargeText = "hello",
-					SmallText = "test",
-					LargeImage = "canary-large",
-					SmallImage = "ptb-small"
-				}
-			};
-			await client.SetActivityAsync(presence);
-			*/
-
-			await client.SetActivityAsync(x =>
-			{
-				x.Details = "DotnetRPC.Sample";
-				x.State = "Part of DSharpPlus";
-				x.StartUnix = DateTimeOffset.Now;
-				x.EndUnix = DateTimeOffset.Now.AddHours(24);
-
-				x.LargeImage = "canary-large";
-				x.LargeImageText = "Testing testing testing";
-
-				x.SmallImage = "ptb-small";
-				x.SmallImageText = "ayy ayy";
-			});
-
-			await Task.Delay(10000);
+			await Task.Delay(15000);
 			client.Dispose();
 			Console.WriteLine("It's gone!");
+			Console.ReadKey();
 		}
 	}
 }

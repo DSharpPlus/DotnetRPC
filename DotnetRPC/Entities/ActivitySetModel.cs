@@ -35,6 +35,8 @@ namespace DotnetRPC.Entities
 		public string MatchSecret = "";
 
 		public string SpectateSecret = "";
+
+		public RpcActivityType? Type { get; internal set; } = null;
     }
 
 	public class Time

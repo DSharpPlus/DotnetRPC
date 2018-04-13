@@ -20,10 +20,20 @@ namespace DotnetRPC.Entities
 		public RpcActivity Activity { get; internal set; }
 	}
 
+	public enum RpcActivityType
+	{
+		Playing = 0,
+		Streaming = 1,
+		Listening = 2
+	}
+
 	public class RpcActivity
 	{
 		[JsonProperty("state", NullValueHandling = NullValueHandling.Ignore)]
 		public string State { get; set; }
+
+		[JsonProperty("type", NullValueHandling = NullValueHandling.Ignore)]
+		public RpcActivityType? Type { get; internal set; } = null;
 
 		[JsonProperty("details", NullValueHandling = NullValueHandling.Ignore)]
 		public string Details { get; set; }
